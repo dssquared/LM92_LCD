@@ -22,7 +22,7 @@ int main(void){
 	
 	byte tempHighByte, tempLowByte, displayTemp;
 	uint16_t tempWord;
-	float cTemp, fTemp;
+	double cTemp, fTemp;
 	
 	//  ----  inits  ----  //
 	initI2C();
@@ -33,6 +33,7 @@ int main(void){
     
     while (1) 
     {
+		// read temperature register from LM92
 		i2cStart();
 		i2cSend(LM92_ADDRESS_W);
 		i2cSend(LM92_TEMP_REGISTER);
@@ -42,24 +43,36 @@ int main(void){
 		tempLowByte = i2cReadNoAck();
 		i2cStop();
 		
+		// assemble 2 8-bit readings to 16-bit word
 		tempWord = 0x00;
 		tempWord = (uint16_t)tempHighByte << 8;
 		tempWord |= tempLowByte;
-		cTemp = (tempWord >> 3) * 0.0625;
-		fTemp = ((cTemp * 9.00) / 5.00) + 32.00;
 		
+		// output LM92 data for debug
+		LCD_hex(tempWord>>3);
+		_delay_ms(3000);
+		
+		// calculate temp
+		cTemp = (tempWord >> 3) * 0.0625;
+		//fTemp = ((cTemp * 9.00) / 5.00) + 32.00;
+		fTemp = (cTemp * 1.80) + 32.00;
+		
+		// display Fahrenheit
 		displayTemp = (byte)fTemp;
+		LCD_clear();
 		LCD_string("Temp: ");
 		LCD_integer(displayTemp);
-		/**
-		if (tempLowByte & (1 << 7)){
-			LCD_string(".5");
-		}else{
-			LCD_string(".0");
-		}
-		*/
 		LCD_char(DEG);
 		LCD_char('F');
+		
+		// display Celsius
+		displayTemp = (byte)cTemp;
+		LCD_line(1);
+		LCD_string("Temp: ");
+		LCD_integer(displayTemp);
+		LCD_char(DEG);
+		LCD_char('C');
+		
 		_delay_ms(5000);
 		LCD_clear();
 		
