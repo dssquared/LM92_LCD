@@ -136,7 +136,7 @@ void LCD_char(byte ch);
  @see      hitachi data sheet pg. 46
            optrex data sheet pg. 33
 */
-void LCD_init(void);
+void initLCD(void);
 
 /**
  @brief

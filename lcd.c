@@ -66,7 +66,7 @@ void LCD_char(byte ch){
 	sendByte(ch);
 }  // end LCD_char()
 
-void LCD_init(){
+void initLCD(){
 	setupLCDPorts();                  // set proper data directions and pins to outputs
 	_delay_ms(15);
 	LCD_cmd(0b00110000);              // see data sheet for timings and initialization sequence for 4-bit mode
